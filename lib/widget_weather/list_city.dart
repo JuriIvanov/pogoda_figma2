@@ -30,17 +30,23 @@ class _ListCityWidgetState extends State<ListCityWidget> {
       }),
     );
   }
+  Color color = const Color(0xFF362762);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF362762),
+      backgroundColor: color,
       appBar: AppBar(
         actions: [
           IconButton(
             color: Colors.white,
             icon: const Icon(Icons.more_horiz),
-            onPressed: () {},
+            onPressed: () {
+              color = Colors.blueGrey;
+              setState(() {
+
+              });
+            },
           ),
         ],
         backgroundColor: const Color(0xFF362762),
@@ -89,7 +95,7 @@ class _ListCityWidgetState extends State<ListCityWidget> {
                               listname.removeAt(index);
                             });
                           },
-                          key: Key(listname[index]),
+                            key: UniqueKey(),
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
@@ -158,7 +164,7 @@ class _ListCityWidgetState extends State<ListCityWidget> {
                                           color: Color(0xFFFFFFFF),
                                         ),
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ),
                               ),

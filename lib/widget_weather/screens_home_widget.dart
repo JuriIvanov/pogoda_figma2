@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 
 import '../my_widget/week_widget.dart';
 import '../repository/repository.dart';
+import 'list_city.dart';
 
 class ScreensHomeWidget extends StatelessWidget {
-  final String sity;
+  String sity;
 
   ScreensHomeWidget({
     super.key,
@@ -15,6 +16,7 @@ class ScreensHomeWidget extends StatelessWidget {
   final jsonPogodaModel = JsonPogodaModel();
 
   final repository = Repository();
+  final textcontroller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -167,16 +169,75 @@ class ScreensHomeWidget extends StatelessWidget {
                           width: 105,
                         ),
                         IconButton(
-                            onPressed: () {},
-                            iconSize: 50,
-                            color: Colors.white,
-                            icon: const Icon(Icons.add_circle_sharp)),
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text("Введите город"),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          print(sity);
+
+                                          Navigator.pop(context);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ScreensHomeWidget(sity: sity),
+                                            ),
+                                          );
+                                        },
+                                        child: const Text("Добавить"),
+                                      ),
+                                    ],
+                                    content: TextField(
+                                      onChanged: (String value) {
+                                        sity = value;
+                                        textcontroller.clear();
+                                      },
+                                      decoration: InputDecoration(
+                                        filled: true,
+                                        fillColor: const Color(0xFF2E335A),
+                                        prefixIcon: Icon(
+                                          Icons.search,
+                                          color: Colors.white.withOpacity(0.6),
+                                        ),
+                                        border: const OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15.0)),
+                                        ),
+                                        hintText: 'Поиск города',
+                                        hintStyle: TextStyle(
+                                          color: Colors.white.withOpacity(0.6),
+                                        ),
+                                        focusedBorder: const OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Colors.black, width: 2.0),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20.0)),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                });
+                          },
+                          iconSize: 50,
+                          color: Colors.white,
+                          icon: const Icon(Icons.add_circle_sharp),
+                        ),
                         const SizedBox(
                           width: 90,
                         ),
                         IconButton(
                             onPressed: () {
-                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ListCityWidget(),
+                                ),
+                              );
                             },
                             iconSize: 32,
                             color: Colors.white70,
