@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../model/jsonPogodaModel.dart';
+import '../my_directory_with_pogoda/model/jsonPogodaModel.dart';
 import '../repository/repository.dart';
 
 class WeekWidget extends StatelessWidget {
@@ -55,7 +55,7 @@ class WeekWidget extends StatelessWidget {
                               ),
                             ),
                             Image.network(
-                              "http:$iconcondition",
+                              "http://$iconcondition",
                             ),
                             Text(strTempC,
                                 style: const TextStyle(

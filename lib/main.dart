@@ -1,21 +1,32 @@
-import 'package:figma_pogoda2/widget_weather/list_city.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'widget_weather/fagma_pogoda2.dart';
-import 'widget_weather/screens_home_widget.dart';
+import 'my_directory_with_pogoda/view/view_first_screen/screen_home/view_pogoda_home_widget.dart';
+import 'my_directory_with_pogoda/state/state_home_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+late final SharedPreferences sharedPreferences;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  sharedPreferences = await SharedPreferences.getInstance();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+
+  final WeatherState _weatherState = WeatherState();
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: ScreensHomeWidget(
-      sity: 'Дербент',
-    ));
+    return MultiProvider(
+      providers: [
+        Provider<WeatherState>(create: (_) => _weatherState..loadPogodaModel()..loadPogodaModelList()),
+      ],
+      child: const MaterialApp(
+        home: ViewPogoda(),
+      ),
+    );
   }
 }

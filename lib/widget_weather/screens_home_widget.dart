@@ -1,21 +1,30 @@
-import 'package:figma_pogoda2/model/jsonPogodaModel.dart';
+import 'package:figma_pogoda2/my_directory_with_pogoda/model/jsonPogodaModel.dart';
 import 'package:flutter/material.dart';
 
+import '../my_widget/settings_weather.dart';
+import 'geolocation.dart';
 import '../my_widget/week_widget.dart';
 import '../repository/repository.dart';
 import 'list_city.dart';
 
-class ScreensHomeWidget extends StatelessWidget {
-  String sity;
+class ScreensHomeWidget extends StatefulWidget {
+  String city;
 
   ScreensHomeWidget({
     super.key,
-    required this.sity,
+    required this.city,
   });
 
+  @override
+  State<ScreensHomeWidget> createState() => _ScreensHomeWidgetState();
+}
+
+class _ScreensHomeWidgetState extends State<ScreensHomeWidget> {
   final jsonPogodaModel = JsonPogodaModel();
 
   final repository = Repository();
+
+
   final textcontroller = TextEditingController();
 
   @override
@@ -24,20 +33,10 @@ class ScreensHomeWidget extends StatelessWidget {
       home: Scaffold(
         body: Stack(
           children: [
-            Container(
-              height: 813.1,
-              width: 392.7,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage(
-                      'assets/image/фон.png',
-                    ),
-                    fit: BoxFit.fill),
-              ),
-            ),
+            const BackgroundImage(),
             Center(
               child: FutureBuilder<JsonPogodaModel?>(
-                future: repository.fetchPogoda(sity),
+                future: repository.fetchPogoda(widget.city),
                 builder: (BuildContext context,
                     AsyncSnapshot<JsonPogodaModel?> snapshot) {
                   if (snapshot.hasData) {
@@ -101,19 +100,9 @@ class ScreensHomeWidget extends StatelessWidget {
                 },
               ),
             ),
-            Positioned(
+            const Positioned(
               top: 300,
-              child: Container(
-                height: 400,
-                width: 392.7,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage(
-                        'assets/image/House.png',
-                      ),
-                      fit: BoxFit.fill),
-                ),
-              ),
+              child: ImageHouse(),
             ),
             Positioned(
               bottom: 0,
@@ -153,21 +142,15 @@ class ScreensHomeWidget extends StatelessWidget {
                       thickness: 3,
                     ),
                     WeekWidget(
-                      name: sity,
+                      name: widget.city,
+                    ),
+                    const SizedBox(
+                      height: 12,
                     ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        IconButton(
-                            onPressed: () {},
-                            iconSize: 32,
-                            color: Colors.white70,
-                            icon: const Icon(Icons.place_outlined)),
-                        const SizedBox(
-                          width: 105,
-                        ),
+                        const IconButtonPushGeolocation(),
                         IconButton(
                           onPressed: () {
                             showDialog(
@@ -178,14 +161,13 @@ class ScreensHomeWidget extends StatelessWidget {
                                     actions: [
                                       TextButton(
                                         onPressed: () {
-                                          print(sity);
-
                                           Navigator.pop(context);
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  ScreensHomeWidget(sity: sity),
+                                                  ScreensHomeWidget(
+                                                      city: widget.city),
                                             ),
                                           );
                                         },
@@ -194,7 +176,7 @@ class ScreensHomeWidget extends StatelessWidget {
                                     ],
                                     content: TextField(
                                       onChanged: (String value) {
-                                        sity = value;
+                                        widget.city = value;
                                         textcontroller.clear();
                                       },
                                       decoration: InputDecoration(
@@ -216,42 +198,183 @@ class ScreensHomeWidget extends StatelessWidget {
                                           borderSide: BorderSide(
                                               color: Colors.black, width: 2.0),
                                           borderRadius: BorderRadius.all(
-                                              Radius.circular(20.0)),
+                                              Radius.circular(20.0),),
                                         ),
                                       ),
                                     ),
                                   );
                                 });
                           },
-                          iconSize: 50,
+                          iconSize: 40,
                           color: Colors.white,
                           icon: const Icon(Icons.add_circle_sharp),
                         ),
-                        const SizedBox(
-                          width: 90,
-                        ),
-                        IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ListCityWidget(),
-                                ),
-                              );
-                            },
-                            iconSize: 32,
-                            color: Colors.white70,
-                            icon: const Icon(
-                                Icons.format_list_bulleted_outlined)),
+                        const IconButtonPushListCityWidgets(),
+                        const IconButtonPushSettingsWeather(),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+class BackgroundImage extends StatelessWidget {
+  const BackgroundImage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 813.1,
+      width: 392.7,
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+            image: AssetImage(
+              'assets/image/фон.png',
+            ),
+            fit: BoxFit.fill),
+      ),
+    );
+  }
+}
+
+class ImageHouse extends StatelessWidget {
+  const ImageHouse({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 400,
+      width: 392.7,
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+            image: AssetImage(
+              'assets/image/House.png',
+            ),
+            fit: BoxFit.fill),
+      ),
+    );
+  }
+}
+
+class IconButtonPushGeolocation extends StatelessWidget {
+  const IconButtonPushGeolocation({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const GeolocationSity(),
+          ),
+        );
+      },
+      iconSize: 40,
+      color: Colors.white70,
+      icon: const Icon(Icons.place_outlined),
+    );
+  }
+}
+
+class IconButtonPushSettingsWeather extends StatelessWidget {
+  const IconButtonPushSettingsWeather({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const SettingsWeather(),
+          ),
+        );
+      },
+      iconSize: 40,
+      color: Colors.white70,
+      icon: const Icon(Icons.settings),
+    );
+  }
+}
+
+class IconButtonPushListCityWidgets extends StatelessWidget {
+  const IconButtonPushListCityWidgets({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ListCityWidget(),
+          ),
+        );
+      },
+      iconSize: 40,
+      color: Colors.white70,
+      icon: const Icon(Icons.format_list_bulleted_outlined),
+    );
+  }
+}
+//
+//
+// class ButtonShowAlertDialogEndSaveCity extends StatelessWidget {
+//   ButtonShowAlertDialogEndSaveCity({super.key, required this.city});
+//
+//   final String city;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return AlertDialog(
+//       title: const Text("Введите город"),
+//       actions: [
+//         TextButton(
+//           onPressed: () {
+//             Navigator.pop(context);
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(
+//                 builder: (context) => ScreensHomeWidget(sity: city),
+//               ),
+//             );
+//           },
+//           child: const Text("Добавить"),
+//         ),
+//       ],
+//       content: TextField(
+//         onChanged: (String value) {
+//           city = value;
+//
+//           textcontroller.clear();
+//         },
+//         decoration: InputDecoration(
+//           filled: true,
+//           fillColor: const Color(0xFF2E335A),
+//           prefixIcon: Icon(
+//             Icons.search,
+//             color: Colors.white.withOpacity(0.6),
+//           ),
+//           border: const OutlineInputBorder(
+//             borderRadius: BorderRadius.all(Radius.circular(15.0)),
+//           ),
+//           hintText: 'Поиск города',
+//           hintStyle: TextStyle(
+//             color: Colors.white.withOpacity(0.6),
+//           ),
+//           focusedBorder: const OutlineInputBorder(
+//             borderSide: BorderSide(color: Colors.black, width: 2.0),
+//             borderRadius: BorderRadius.all(Radius.circular(20.0)),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

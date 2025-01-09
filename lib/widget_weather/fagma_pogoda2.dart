@@ -1,7 +1,7 @@
 import 'package:figma_pogoda2/repository/repository.dart';
 import 'package:flutter/material.dart';
 
-import '../model/jsonPogodaModel.dart';
+import '../my_directory_with_pogoda/model/jsonPogodaModel.dart';
 
 class HomePogodaWidget extends StatefulWidget {
   const HomePogodaWidget({super.key});

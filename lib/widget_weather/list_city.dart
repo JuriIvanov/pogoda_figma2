@@ -1,7 +1,9 @@
-import 'package:figma_pogoda2/widget_weather/screens_home_widget.dart';
+import 'package:figma_pogoda2/state/counter_state.dart';
+
 import 'package:flutter/material.dart';
 
-import '../model/jsonPogodaModel.dart';
+import '../my_directory_with_pogoda/model/jsonPogodaModel.dart';
+import '../my_directory_with_pogoda/view/view_list_container_with_city/wideget_for_list_city/my_custom_clipper.dart';
 import '../repository/repository.dart';
 
 class ListCityWidget extends StatefulWidget {
@@ -16,57 +18,69 @@ final jsonPogodaModel = JsonPogodaModel();
 final repository = Repository();
 
 class _ListCityWidgetState extends State<ListCityWidget> {
-  List<String> listname = [
-    "Казань",
-    'Ростов',
-  ];
-  final textcontroller = TextEditingController();
+  @override
 
-  void _onCityTap(int index) {
-    final id = listname[index];
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) {
-        return ScreensHomeWidget(sity: id);
-      }),
-    );
+  void initState() {
+    counter.observableList.add('Казань');
+    super.initState();
   }
-  Color color = const Color(0xFF362762);
+  final CounterState counter = CounterState();
+
+  final textcontroller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: color,
+      backgroundColor: //Theme.of(context).colorScheme.background,
+      const Color(0xFF1F1D47),
       appBar: AppBar(
-        actions: [
-          IconButton(
-            color: Colors.white,
-            icon: const Icon(Icons.more_horiz),
-            onPressed: () {
-              color = Colors.blueGrey;
-              setState(() {
-
-              });
-            },
-          ),
-        ],
-        backgroundColor: const Color(0xFF362762),
+        leading: const BackButton(
+          color: Colors.white,
+        ),
         title: const Text(
           ' Погода',
           style: TextStyle(color: Colors.white, fontSize: 28),
         ),
+        actions: [
+          PopupMenuButton(
+            itemBuilder: (BuildContext context) {
+              return [
+                const PopupMenuItem(
+                  child: Row(
+                    children: [
+                      Text('Сменить тему'),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Icon(
+                        Icons.color_lens_outlined,
+                        color: Colors.lightBlueAccent,
+                      ),
+                    ],
+                  ),
+                ),
+              ];
+            },
+            icon: const Icon(
+              Icons.more_horiz_sharp,
+              color: Colors.white,
+            ),
+          ),
+        ],
+        backgroundColor: const Color(0xFF1F1D47),
       ),
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+            padding: const EdgeInsets.fromLTRB(20, 50, 20, 0),
             child: ListView.builder(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              itemCount: listname.length,
+              itemCount: counter.observableList.length,
               itemBuilder: (BuildContext context, int index) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: FutureBuilder<JsonPogodaModel?>(
-                    future: repository.fetchPogoda(listname[index]),
+                    future: repository.fetchPogoda(counter.observableList[index]),
                     builder: (BuildContext context,
                         AsyncSnapshot<JsonPogodaModel?> snapshot) {
                       if (snapshot.hasData) {
@@ -74,10 +88,8 @@ class _ListCityWidgetState extends State<ListCityWidget> {
                             snapshot.data?.current?.condition?.text;
                         final String? location =
                             snapshot.data?.location?.name.toString();
-
                         final String? iconcondition =
                             snapshot.data?.current?.condition?.icon;
-
                         final int? tempC =
                             snapshot.data?.current?.tempC?.round();
 
@@ -92,81 +104,103 @@ class _ListCityWidgetState extends State<ListCityWidget> {
                         return Dismissible(
                           onDismissed: (DismissDirection direction) {
                             setState(() {
-                              listname.removeAt(index);
+                              counter.observableList.removeAt(index);
                             });
                           },
-                            key: UniqueKey(),
+                          key: UniqueKey(),
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
-                              onTap: () => _onCityTap(index),
+                              onTap: () {
+                                counter.onCityTap(index, context);
+                              },
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(30)),
-                              child: Container(
-                                height: 184,
-                                width: 342,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF5735B1),
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                child: Stack(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 28),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                              child: Stack(
+                                children: [
+                                  ClipPath(
+                                    clipper: MyCustomClipper(),
+                                    child: Container(
+                                      height: 184,
+                                      width: 360,
+                                      decoration: const BoxDecoration(
+                                        gradient: LinearGradient(colors: [
+                                          Color(0xFF5936B4),
+                                          Color(0xFF362A84),
+                                        ]),
+                                        // borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      child: Stack(
                                         children: [
-                                          Text(
-                                            strTempC,
-                                            style: const TextStyle(
-                                                color: Color(0xFFFFFFFF),
-                                                fontSize: 72,
-                                                height: 0.85,
-                                                fontWeight: FontWeight.w300),
-                                          ),
-                                          const SizedBox(
-                                            height: 16,
-                                          ),
-                                          Text(
-                                            tempString,
-                                            style: TextStyle(
-                                              color: const Color(0xFFFFFFFF)
-                                                  .withOpacity(0.6),
-                                              fontSize: 16,
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 20, vertical: 28),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  strTempC,
+                                                  style: const TextStyle(
+                                                      color: Color(0xFFFFFFFF),
+                                                      fontSize: 72,
+                                                      height: 0.85,
+                                                      fontWeight:
+                                                          FontWeight.w300),
+                                                ),
+                                                const SizedBox(
+                                                  height: 16,
+                                                ),
+                                                Text(
+                                                  tempString,
+                                                  style: TextStyle(
+                                                    color:
+                                                        const Color(0xFFFFFFFF)
+                                                            .withOpacity(0.6),
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  location!,
+                                                  style: const TextStyle(
+                                                    color: Color(0xFFFFFFFF),
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          Text(
-                                            location!,
-                                            style: const TextStyle(
-                                              color: Color(0xFFFFFFFF),
-                                              fontSize: 16,
+                                          Positioned(
+                                            bottom: 20,
+                                            right: 20,
+                                            child: Text(
+                                              conditionText!,
+                                              style: const TextStyle(
+                                                fontSize: 20,
+                                                color: Color(0xFFFFFFFF),
+                                              ),
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    Positioned(
-                                      top: 20,
-                                      right: 20,
-                                      child: Image.network(
-                                        "http:$iconcondition",
+                                  ),
+                                  const Positioned(
+                                    right: 0,
+                                    top: 0,
+                                    height: 150,
+                                    width: 150,
+                                    child: Image(
+                                      image: AssetImage(
+                                        'assets/image/Пасмурно.png',
                                       ),
                                     ),
-                                    Positioned(
-                                      bottom: 20,
-                                      right: 20,
-                                      child: Text(
-                                        conditionText!,
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          color: Color(0xFFFFFFFF),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                    // Image.network(
+                                    //   "http:$iconcondition",
+                                    //   fit: BoxFit.cover,
+                                    // ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -191,9 +225,11 @@ class _ListCityWidgetState extends State<ListCityWidget> {
                     controller: textcontroller,
                     onSubmitted: (String sity) {
                       if (sity.isNotEmpty) {
-                        listname.add(sity);
+                        counter.observableList.add(sity);
+                        setState(() {
 
-                        setState(() {});
+                        });
+
                       }
                       textcontroller.clear();
                     },
@@ -203,7 +239,7 @@ class _ListCityWidgetState extends State<ListCityWidget> {
                     obscureText: false,
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: const Color(0xFF2E335A),
+                      fillColor: const Color(0xFF1F1D47),
                       prefixIcon: Icon(
                         Icons.search,
                         color: Colors.white.withOpacity(0.6),
@@ -224,7 +260,7 @@ class _ListCityWidgetState extends State<ListCityWidget> {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
+
 class JsonPogodaModel {
   JsonPogodaModel({
     this.location,
