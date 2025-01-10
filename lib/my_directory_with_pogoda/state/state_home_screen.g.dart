@@ -99,6 +99,14 @@ mixin _$WeatherState on WeatherStateBase, Store {
     return _$onCityTapAsyncAction.run(() => super.onCityTap(city, context));
   }
 
+  late final _$cityHomeAsyncAction =
+      AsyncAction('WeatherStateBase.cityHome', context: context);
+
+  @override
+  Future<void> cityHome(String city, BuildContext context) {
+    return _$cityHomeAsyncAction.run(() => super.cityHome(city, context));
+  }
+
   @override
   String toString() {
     return '''

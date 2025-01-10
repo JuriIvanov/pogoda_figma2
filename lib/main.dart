@@ -20,9 +20,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _weatherState.initialization();
     return MultiProvider(
       providers: [
-        Provider<WeatherState>(create: (_) => _weatherState..loadPogodaModel()..loadPogodaModelList()),
+        Provider<WeatherState>(create: (_) => _weatherState),
       ],
       child: const MaterialApp(
         home: ViewPogoda(),

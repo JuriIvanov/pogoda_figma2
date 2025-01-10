@@ -58,4 +58,16 @@ abstract class WeatherStateBase with Store {
   Future<void> cityHome(String city, BuildContext context) async {
     await loadPogodaModel(city: city);
   }
+
+  Future<void> onSubmittedAndAddCityToObservableList(
+      {required String city, required BuildContext context}) async {
+    Navigator.pop(context);
+    onCityTap(city, context);
+    addCityToObservableList(city);
+  }
+
+  void initialization() {
+    loadPogodaModel();
+    loadPogodaModelList();
+  }
 }

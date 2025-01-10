@@ -28,8 +28,8 @@ class RowButtonWidget extends StatelessWidget {
                     actions: [
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(context);
-                          state.onCityTap(cityHome, context);
+                          state.onSubmittedAndAddCityToObservableList(
+                              city: cityHome, context: context);
                         },
                         child: const Text("Добавить"),
                       ),
@@ -37,9 +37,11 @@ class RowButtonWidget extends StatelessWidget {
                     content: TextField(
                       onChanged: (String value) {
                         cityHome = value;
-
                       },
-                      onSubmitted: state.addCityToObservableList,
+                      onSubmitted: (String value) {
+                        state.onSubmittedAndAddCityToObservableList(
+                            city: value, context: context);
+                      },
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: const Color(0xFF2E335A),
